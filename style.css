@@ -1,0 +1,25 @@
+table{
+    background-color: #F1E2D2;
+    border-radius: 10%;
+    border-collapse: collapse;
+    border: #F1E2D2;
+    font-weight: 1;
+    color:#080a1d;
+    column-gap: 10px;
+}
+
+thead{
+    background-color: #19243d;
+    color:#EFE5DC;
+    text-align:center
+
+}
+
+.css-1esp1o1 th, .css-1esp1o1 td {
+    padding: 4px 15px;
+}
+
+div.element-container.css-4db2gq.e1tzin5v3{
+    background-color:antiquewhite;
+}
+
