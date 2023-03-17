@@ -181,13 +181,13 @@ class Get:
     def receitas_total(): 
         return import_excel_data('receitas_2022.xlsx', sheet_name='Resumo Tags', dbx=dbx)
     
-    @st.cache_data(ttl=60*30, max_entries=50)
+    @st.cache(ttl=60*30, max_entries=50, allow_output_mutation=True)
     def receitas_cliente(): 
         df = import_excel_data('receitas_clientes_2022.xlsx', dbx=dbx)
         df['Cliente'] = df['Cliente'].astype(str)
         return df
     
-    @st.cache_data(ttl=60*30, max_entries=50)
+    @st.cache(ttl=60*30, max_entries=50, allow_output_mutation=True)
     def captacao_cliente(): 
         df = import_excel_data('captacao_cliente_2022.xlsx', dbx=dbx)
         df['Cliente'] = df['Cliente'].astype(str)
@@ -254,7 +254,7 @@ class Get:
 
         return df
     
-    @st.cache_data(ttl=60*30, max_entries=50)
+    @st.cache(ttl=60*30, max_entries=50, allow_output_mutation=True)
     def diversificador(data_hoje):
         
         diversificador = import_excel_data(f'diversificacao_{data_hoje}.xlsx', r'/Fatorial/Inteligência/Codigos/COE/arquivos/', dbx=dbx, skip_rows=2)
@@ -264,7 +264,7 @@ class Get:
         
         return diversificador
     
-    @st.cache_data(ttl=60*30, max_entries=50)
+    @st.cache(ttl=60*30, max_entries=50, allow_output_mutation=True)
     def captacao(data_hoje, sheet_name='Resumo'):
         try:
             
@@ -323,7 +323,7 @@ class Get:
 
         return clientes_char, clientes_thieme
 
-    @st.cache_data(ttl=60*30, max_entries=50)
+    @st.cache(ttl=60*30, max_entries=50, allow_output_mutation=True)
     def receitas(dia):
         data_obj = Data(dia)
         mes = data_obj.text_month
@@ -357,7 +357,7 @@ class Get:
 
 class LandingPage:
     
-    @st.cache_data(ttl=60*30, max_entries=50)
+    @st.cache(ttl=60*30, max_entries=50)
     def filter_receita(receita, assessores, clientes_rodrigo):
         mask_ajustes = receita['Categoria'].isin(['Ajuste', 'Ajustes XP', 'Outros Ajustes', 'Incentivo Comercial', 'Complemento de Comissão Mínima', 'Desconto de Transferência de Clientes', 'Incentivo', 'Erro Operacional'])
         receita = receita[~mask_ajustes]
@@ -376,7 +376,7 @@ class LandingPage:
 
         return receita
 
-    @st.cache_data(ttl=60*30, max_entries=50)
+    @st.cache(ttl=60*30, max_entries=50)
     def get_novos_transf_display(novos_transf, suitability):
     
         novos_transf_display = novos_transf[['Cliente', 'Net Em M', 'Transferência?']]
@@ -393,7 +393,7 @@ class LandingPage:
 
         return novos_transf_display
 
-    @st.cache_data(ttl=60*30, max_entries=50)
+    @st.cache(ttl=60*30, max_entries=50)
     def get_perdidos_display(perdidos, suitability):
         
         perdidos_display = perdidos[['Cliente', 'Net Em M']]
@@ -410,7 +410,7 @@ class LandingPage:
 
         return perdidos_display
 
-    @st.cache_data(ttl=60*30, max_entries=50)
+    @st.cache(ttl=60*30, max_entries=50)
     def get_receitas_tag_clientes(receita, tags, categorias, positivador):
         df_cliente = receita.groupby('Cliente').sum()[['Valor Bruto Recebido']].reset_index(drop=False)
         df_tags = receita.merge(tags, how='left', on='Categoria').groupby('Centro de Custo').sum()[['Valor Bruto Recebido']].sort_values('Valor Bruto Recebido', ascending=False)
@@ -1396,7 +1396,7 @@ def rotina_coe(dia_hoje):
         file_name = f'Relatório_COE_{mes}.xlsx',
         mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-@st.cache_data(ttl=60*30, max_entries=50)
+@st.cache(ttl=60*30, max_entries=50)
 def get_most_recent_data(input_date=date.today(), return_type='cod'):
     '''return type msut be either "cod" or "datetime".'''
 
@@ -2452,7 +2452,7 @@ class NPS:
                 mode=dropbox.files.WriteMode.overwrite)
 
 class ResumoCarteira:
-    @st.cache_data(ttl=60*30, max_entries=50)
+    @st.cache(ttl=60*30, max_entries=50, allow_output_mutation=True)
     def get_resumo(posi, assessores, suitability, clientes_rodrigo, nomes_filtrados):
 
         capt_clientes = Get.captacao_cliente()
