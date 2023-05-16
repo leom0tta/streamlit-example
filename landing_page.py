@@ -1,4 +1,4 @@
-from imports import st, pd, px, go, datetime, make_subplots
+from imports import st, px, pd, go, datetime, make_subplots
 
 from functions import Data, Get, Dataframe, LandingPage, ApiError
 from functions import to_excel, horizontal_singular_bar, espacamento, get_meses, get_most_recent_data
@@ -156,8 +156,8 @@ def app(name, most_recent_data=most_recent_data, contas_novas=contas_novas, asse
 
         fig = px.funnel(faixas, x='Cliente', y='Faixa', title=title)
 
-        fig.update_traces(marker_color='rgb(29,40,67)', marker_line_color='rgb(29,40,67)',
-                  marker_line_width=1.5, opacity=.96)
+        fig.update_traces(marker_color='rgb(29,40,67)', marker_line_color='rgb(29,40,67)',)
+                  #marker_line_width=1.5, opacity=.96)
         
         fig.update_layout(title_x=0.5, title_font_size=20)
 
@@ -291,8 +291,8 @@ def app(name, most_recent_data=most_recent_data, contas_novas=contas_novas, asse
 
         fig = go.Figure()
         fig.add_trace(go.Bar(x=plot_captacao['Cliente'].head(10), y=plot_captacao['Captação'].head(10), width=.5))
-        fig.update_traces(marker_color='rgb(125, 147, 189)', marker_line_color='rgb(125, 147, 189)',
-                  marker_line_width=1.5, opacity=.96)
+        fig.update_traces(marker_color='rgb(125, 147, 189)', marker_line_color='rgb(125, 147, 189)',)
+                  #marker_line_width=1.5, opacity=.96)
 
         col2.plotly_chart(fig, use_container_width=True)
 
@@ -324,8 +324,8 @@ def app(name, most_recent_data=most_recent_data, contas_novas=contas_novas, asse
         fig = go.Figure()
         fig.add_trace(go.Bar(x=plot_retiradas['Cliente'].head(10), y=plot_retiradas['Captação'].head(10), width=.5))
 
-        fig.update_traces(marker_color='rgb(29,40,67)', marker_line_color='rgb(29,40,67)',
-                  marker_line_width=1.5, opacity=.96)
+        fig.update_traces(marker_color='rgb(29,40,67)', marker_line_color='rgb(29,40,67)',)
+                  #marker_line_width=1.5, opacity=.96)
 
         col2.plotly_chart(fig, use_container_width=True)
 
@@ -341,7 +341,7 @@ def app(name, most_recent_data=most_recent_data, contas_novas=contas_novas, asse
         receita_cliente_proprio = receita.loc[mask_atende_e_indica, 'Valor Bruto Recebido'].sum()
         receita_cliente_emprestado = receita.loc[~mask_atende_e_indica, 'Valor Bruto Recebido'].sum()
 
-        col1, col2 = st.columns([1.4,1])
+        col1, col2 = st.columns([1,2])
 
         espacamento(3, col1)
         col1.metric('Receita Total', 'R$ {:,.2f}'.format(receita['Valor Bruto Recebido'].sum()))
@@ -356,8 +356,8 @@ def app(name, most_recent_data=most_recent_data, contas_novas=contas_novas, asse
 
         fig = px.pie(df_tags.reset_index(drop=False), 'Centro de Custo', 'Valor Bruto Recebido', title='Segmentação da Receita por Centro de Custo')
 
-        fig.update_traces(marker_colors=[f'rgb({29 + 30*i},{40 + 30*i},{67 + 30*i})' for i in range(len(df_tags.index))],
-        marker_line_width=.5, opacity=.96)
+        fig.update_traces(marker_colors=[f'rgb({29 + 30*i},{40 + 30*i},{67 + 30*i})' for i in range(len(df_tags.index))],)
+        #marker_line_width=.5, opacity=.96)
 
         fig.update_layout(title_x=0.5, title_font_size=20)
 

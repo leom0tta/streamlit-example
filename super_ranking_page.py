@@ -1,11 +1,12 @@
-from imports import st, tempfile
+from imports import st, np
 
 from functions import Get, stream_dropbox_file, dbx
-from config import adms, private, exclusive, digital, team_jansen
+from config import assessores, most_recent_data, adms, private, exclusive, digital, team_jansen
 
-def app(name):
+def app(name, assessores=assessores, most_recent_data=most_recent_data):
 
     superranking = Get.superranking_total()
+    superranking_parcial, mes = Get.superranking_parcial(most_recent_data)
 
     # header
 
@@ -16,13 +17,14 @@ def app(name):
     superranking.loc[superranking['Nome assessor'].isin(['Jansen Costa', 'Octavio Bastos']), 'Time'] = 'B2C'
 
     complete_sr = superranking.copy()
+    complete_sr_parcial = superranking_parcial.copy()
 
     meses = superranking.loc[superranking['Ano'] == 23, 'Mes'].drop_duplicates().to_list()
 
     col1, col2 = st.columns(2)
 
     if name in adms:
-        nomes_filtrados = col1.multiselect('Assessor', superranking['Nome assessor'].drop_duplicates().fillna(superranking['Código assessor']).sort_values())
+        nomes_filtrados = col1.multiselect('Assessor', ['Fatorial'] + assessores['Nome assessor'].drop_duplicates().fillna(assessores['Código assessor']).sort_values().to_list())
     
     elif name in team_jansen:
         nomes_filtrados = col1.multiselect('Assessor', [name] + ['Jansen Costa', 'Private'], name)
@@ -39,13 +41,13 @@ def app(name):
     else:
         nomes_filtrados = [name]
 
-    period = col2.multiselect('Período', ['Acumulado 2023', 'Acumulado 2022'] + meses)
+    period = col2.multiselect('Período', ['Acumulado 2023', 'Acumulado 2022'] + meses + [f'Parcial {mes}'])
 
     if nomes_filtrados != [] and period != []:
 
         if not nomes_filtrados == []:
             superranking = superranking[ superranking['Nome assessor'].isin(nomes_filtrados) ]
-
+            superranking_parcial = superranking_parcial[ superranking_parcial['Nome assessor'].isin(nomes_filtrados) ]
         if period == ['Acumulado 2023']:
             year = 23
             superranking = superranking.loc[ (superranking['Ano'] == year) ]
@@ -59,6 +61,12 @@ def app(name):
             superranking = superranking.loc[ (superranking['Ano'] == year) & (superranking['Mes'].isin(period))]
             complete_sr = complete_sr.loc[ (complete_sr['Ano'] == year) & (complete_sr['Mes'].isin(period))]
         
+        elif period == [f'Parcial {mes}']:
+            year = 23
+            superranking = superranking_parcial.copy()
+            complete_sr = complete_sr_parcial.copy()
+            n_meses = 1
+
         else:
             year = 23
             superranking = superranking.loc[ (superranking['Mes'].isin(period)) & (superranking['Ano'] == year)]
@@ -147,39 +155,40 @@ def app(name):
         #nps aniversario
 
         position = get_position('NPS Aniversário')
-        nps1_total = superranking['NPS Aniversário'].sum()/len(superranking['NPS Aniversário'])
+        if superranking['NPS Aniversário'].isnull().all():
+            nps1_total = 'Não houve respostas'
+        else:
+            nps1_total = round(superranking['NPS Aniversário'].dropna().mean(),2)
         pts_nps1 = superranking['Pontos NPS Aniversário'].sum()
         col2.write(f"""
         #### NPS Aniversário (5%) {position}
-        - NPS Aniversário: **{round(nps1_total,2)}**
+        - NPS Aniversário: **{nps1_total}**
         - Pontos NPS Aniversário: {pts_nps1}""")
 
         #nps onboarding
 
         position = get_position('NPS Onboarding')
-        nps2_total = superranking['NPS Onboarding'].sum()/len(superranking['NPS Onboarding'])
+        if superranking['NPS Onboarding'].isnull().all():
+            nps2_total = 'Não houve respostas'
+        else:
+            nps2_total = round(superranking['NPS Onboarding'].dropna().mean(),2)
         pts_nps2 = superranking['Pontos NPS Onboarding'].sum()
         col1.write(f"""
         #### NPS Onboarding (5%) {position}
-        - NPS Onboarding: **{round(nps2_total,2)}**
+        - NPS Onboarding: **{nps2_total}**
         - Pontos NPS Onboarding: {pts_nps2}""")
 
         #% respostas
 
         position = get_position('Percentual de Resposta')
         perc_resp_total = superranking['Percentual de Resposta'].sum()/len(superranking['Percentual de Resposta'])
-        peso_total = superranking['Fator de Peso'].sum()
+        peso_total = superranking['Fator de Peso'].mean()
         col2.write(f"""
         #### Percentual de Respostas (Peso) {position}
         - Percentual de Respostas: **{'{:,.2f} %'.format(perc_resp_total*100)}**
         - Fator de Peso Médio: {round(peso_total,2)}""")
 
-        file_id = r'id:OQRfgJ5J_9AAAAAAAACQQg'
-
-        with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
-            metadata, file_content = dbx.files_download(file_id)
-            tmp_file.write(file_content.content)
-
         bytes_obj = stream_dropbox_file('/Fatorial/Inteligência/Codigos/G20/Relatorio/Faixas de Pontuação/Simulador SR.xlsx',dbx)
         
         st.download_button('Simulador do SR', bytes_obj, 'Simulador SR.xlsx')
+    

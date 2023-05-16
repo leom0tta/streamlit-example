@@ -82,8 +82,8 @@ def app(name, most_recent_data = most_recent_data):
 
     fig_1 = go.Figure()
     fig_1.add_trace(go.Bar(x=capt_mes['Month'], y=capt_mes['Captação Líquida em M'], name='Captação', width = 0.5))
-    fig_1.update_traces(selector=dict(name='Captação'), marker_color='rgb(29,40,67)', marker_line_color='rgb(29,40,67)',
-                  marker_line_width=1.5, opacity=.96)
+    fig_1.update_traces(selector=dict(name='Captação'), marker_color='rgb(29,40,67)', marker_line_color='rgb(29,40,67)',)
+                  #marker_line_width=1.5, opacity=.96)
     fig_1.update_layout(title='<b>Captação Histórica da Base</b>', barmode='stack',
                           title_x=0.5, title_font_size=20)
 
@@ -91,8 +91,8 @@ def app(name, most_recent_data = most_recent_data):
 
     fig_2 = go.Figure()
     fig_2.add_trace(go.Bar(x=receita_mes['Month'], y=receita_mes['Valor Bruto Recebido'], name='Receita', width = 0.5))
-    fig_2.update_traces(selector=dict(name='Receita'), marker_color='rgb(29,40,67)', marker_line_color='rgb(29,40,67)',
-                  marker_line_width=1.5, opacity=.96)
+    fig_2.update_traces(selector=dict(name='Receita'), marker_color='rgb(29,40,67)', marker_line_color='rgb(29,40,67)',)
+                  #marker_line_width=1.5, opacity=.96)
     fig_2.update_layout(title='<b>Receita Histórica da Base</b>', barmode='stack',
                           title_x=0.5, title_font_size=20)
     

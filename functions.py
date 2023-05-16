@@ -211,6 +211,21 @@ class Get:
     
     def superranking_total(): 
         return import_excel_data('SuperRanking_Acumulado.xlsx', dbx=dbx)
+    
+    def superranking_parcial(data_hoje): 
+        while True:
+            try:
+                mes = Data(data_hoje).text_month
+                df = import_excel_data(f'Ranking G20 {mes} Parcial.xlsx', '/Fatorial/Inteligência/Codigos/G20/Relatorio/2023/', dbx=dbx)
+                return df, mes
+            except ApiError:
+                data_hoje = get_last_month(data_hoje)
+
+    def saldos(): 
+            df = import_excel_data(f'Saldos.xlsx', '/Coisas da Fatorial/', dbx=dbx)
+            df['Assessor'] = df['Assessor'].astype(str)
+            df['Cliente'] = df['Cliente'].astype(str)
+            return df
 
     def positivador(data_hoje):
         try:
@@ -455,6 +470,7 @@ def to_excel(df, index=True, sheet_names=[]):
 def espacamento(n, self):
     for i in range(n): self.write('')
 
+#@st.cache(ttl=60*30, max_entries=50)
 def stream_dropbox_file(path, dbx):
     _,res=dbx.files_download(path)
     with closing(res) as result:

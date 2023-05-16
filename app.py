@@ -3,7 +3,7 @@ from imports import st
 st.set_page_config(page_title= 'Fatorial Assessores' ,page_icon = '',layout='wide')
 
 import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore")
 
 import captacao_page
 import receita_page
@@ -16,6 +16,8 @@ import landing_page
 import resumo_carteira_page
 import vencimentos_page
 import campanhas_page
+import alimentacao_bd_page
+import recomenday_page
 
 from config import adms
 from multipage import MultiApp
@@ -38,9 +40,11 @@ if authentication_status == True:
     apps.add_app('KPI\'s da Carteira XP', resumo_carteira_page.app, name)
     #apps.add_app('Campanha CFA', campanhas_page.app, name)
     apps.add_app('Relatórios', relatorios_page.app, name)
+    apps.add_app('Recomenday', recomenday_page.app, username)
 
     if name in adms:
         apps.add_app('Rotinas Leo', rotinas_leo_page.app, name)
+        apps.add_app('Registrar Dados', alimentacao_bd_page.app, name)
 
     apps.run()
 

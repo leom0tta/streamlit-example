@@ -1,9 +1,9 @@
 from imports import pd, datetime, st, go, make_subplots
 
 from functions import to_excel, get_meses
-from config import adms, receitas, captacao, private, exclusive, digital, team_jansen
+from config import most_recent_data, adms, receitas, captacao, assessores, private, exclusive, digital, team_jansen
 
-def app(name, captacao=captacao, receitas=receitas):
+def app(name, captacao=captacao, receitas=receitas, assessores=assessores):
 
     month = get_meses()
 
@@ -28,7 +28,7 @@ def app(name, captacao=captacao, receitas=receitas):
     """)
 
     if name in adms:
-        nomes_filtrados = st.multiselect('Assessor', ['Fatorial'] + captacao['Nome assessor'].drop_duplicates().fillna(captacao['Código assessor']).sort_values().to_list(), 'Fatorial')
+        nomes_filtrados = st.multiselect('Assessor', ['Fatorial'] + ['Fatorial'] + assessores['Nome assessor'].drop_duplicates().fillna(assessores['Código assessor']).sort_values().to_list(), 'Fatorial')
 
     elif name in team_jansen:
         nomes_filtrados = st.multiselect('Assessor', [name] + ['Jansen Costa', 'Private'], name)
@@ -81,13 +81,13 @@ def app(name, captacao=captacao, receitas=receitas):
     ultimo_mes_fechado = int(resumo_captacao.index[-1][-2::])
     ultimo_mes_fechado = month[ultimo_mes_fechado-1]
 
-    col1.metric(f"Captação {ultimo_mes_fechado}", 'R$ {:,.2f}'.format(sum(resumo_captacao['Captação Líquida'].tail(1))))
+    col1.metric(f"Captação {ultimo_mes_fechado} (até {most_recent_data[0:2]}/{most_recent_data[2:4]}/{most_recent_data[4:]})", 'R$ {:,.2f}'.format(sum(resumo_captacao['Captação Líquida'].tail(1))))
     col2.metric("Média Móvel 3 meses", 'R$ {:,.2f}'.format(sum(resumo_captacao['Captação Líquida'].tail(3))/3))
     col3.metric("Captação Acumulada 2023", 'R$ {:,.2f}'.format(acumulado_2023))
     col4.metric("Meta Mensal", 'R$ {:,.2f}'.format(3e6))
     col5.metric("Meta Anual", 'R$ {:,.2f}'.format(3e6*12))
 
-    median_assessor_array = [captacao_filt['Captação Líquida'].median() for i in captacao_filt]
+    mean_assessor_array = [captacao_filt['Captação Líquida'].mean() for i in captacao_filt]
 
     exporting_file_cap = resumo_captacao.copy()
 
@@ -95,13 +95,13 @@ def app(name, captacao=captacao, receitas=receitas):
 
     fig.add_trace(go.Bar(x=resumo_captacao.index, y=resumo_captacao['Captação Líquida'], name='Captação', yaxis='y', width = 0.5))
 
-    fig.add_trace(go.Scatter(x=resumo_captacao.index, y=median_assessor_array, name='Mediana Assessor', mode='lines', line=dict(width=2, dash='dot')))
+    fig.add_trace(go.Scatter(x=resumo_captacao.index, y=mean_assessor_array, name='Média Assessor', mode='lines', line=dict(width=2, dash='dot')))
 
-    fig.update_traces(selector=dict(name='Captação'), marker_color='rgb(29,40,67)', marker_line_color='rgb(29,40,67)',
-                  marker_line_width=1.5, opacity=.96)
+    fig.update_traces(selector=dict(name='Captação'), marker_color='rgb(29,40,67)', marker_line_color='rgb(29,40,67)',)
+                  #marker_line_width=1.5, opacity=.96)
     
-    fig.update_traces(selector=dict(name='Mediana Assessor'), marker_color='rgb(125, 147, 189)', marker_line_color='rgb(125, 147, 189)',
-                  marker_line_width=1.5, opacity=.96)
+    fig.update_traces(selector=dict(name='Média Assessor'), marker_color='rgb(125, 147, 189)', marker_line_color='rgb(125, 147, 189)',)
+                  #marker_line_width=1.5, opacity=.96)
     
     resumo_captacao['ROA'] = resumo_captacao['ROA']*100
 

@@ -5,7 +5,7 @@ from config import assessores
 
 def app():
 
-    names = assessores['Nome assessor'].drop_duplicates().to_list()
+    names = assessores['Nome assessor'].drop_duplicates().astype(str).to_list()
     
     usernames = assessores['Código assessor'].drop_duplicates().astype(str).to_list()
 

@@ -8,6 +8,7 @@ from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart 
 from email.mime.text import MIMEText
 import io
+import mysql.connector
 import numpy as np
 import pandas as pd
 from pathlib import Path

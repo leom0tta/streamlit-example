@@ -1,16 +1,19 @@
-from functions import Get, get_most_recent_data, get_most_recent_data_receita
+from functions import Get, get_most_recent_data_receita, get_most_recent_data
 
 # proportion
 bar_height=500
 columns_proportion=[5,3]
 primary_color = '1D2843'
 secondary_background_color = 'F1E2D2'
-background_color = 'EFE5DC'
-text_color = '11153D'
+background_color = 'FCECDC'
+text_color = 'FCE5CD'
 
 
 # groups
-adms = ['Rodrigo Cabral', 'Jansen Costa', 'Leonardo Motta', 'Moises', 'Pablo Langenbach', 'Alexandre Pessanha', 'Louise Miranda']
+adms = ['Rodrigo Cabral', 'Marcio Murad', 'Jansen Costa', 'Pablo Langenbach',               # sócios
+        'Leonardo Motta', 'Moises', 'Alexandre Pessanha', 'Louise Miranda',  'Paulo Minor'  # adm
+        'Rodolfo', 'Lucas Mattoso', 'Eduardo Santos'                                        # mesa rv
+        ]                                        
 team_jansen = ['Yago Meireles']
 private = ['Renata Schneider']
 exclusive = ['Soraya Brum', 'Alex Marinho']
@@ -34,6 +37,12 @@ contas_novas = Get.novos_transf_total()
 most_recent_data = get_most_recent_data()
 most_recent_receita = get_most_recent_data_receita(receitas)
 
+#fluid_databases
+diversificador = Get.diversificador(most_recent_data)
+saldos = Get.saldos()
+
+# bases dados
 assessores = Get.assessores()
+assessores = assessores.loc[assessores['Time'].isin(['B2B','B2C','Outros','Mesa RV'])]
 suitability = Get.suitability()
 clientes_rodrigo = Get.clientes_rodrigo()

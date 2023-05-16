@@ -2,7 +2,7 @@ from imports import st, px, pd, datetime, go
 from imports import make_subplots
 
 from functions import espacamento, to_excel, get_meses
-from config import assessores, metas, adms, receitas, captacao, carteiras, private, exclusive, digital, team_jansen
+from config import assessores, metas, adms, receitas, assessores, captacao, carteiras, private, exclusive, digital, team_jansen
 
 def app(name, receitas=receitas, captacao=captacao, carteiras=carteiras, assessores = assessores):
 
@@ -36,7 +36,7 @@ def app(name, receitas=receitas, captacao=captacao, carteiras=carteiras, assesso
     # content
 
     if name in adms:
-        nomes_filtrados = st.multiselect('Assessor', ['Fatorial'] + receitas['Nome assessor'].drop_duplicates().fillna(receitas['Código assessor']).sort_values().to_list(), 'Fatorial')
+        nomes_filtrados = st.multiselect('Assessor', ['Fatorial'] + assessores['Nome assessor'].drop_duplicates().fillna(assessores['Código assessor']).sort_values().to_list(), 'Fatorial')
     
     elif name in team_jansen:
         nomes_filtrados = st.multiselect('Assessor', [name] + ['Jansen Costa', 'Private'], name)
@@ -123,14 +123,14 @@ def app(name, receitas=receitas, captacao=captacao, carteiras=carteiras, assesso
 
     fig.add_trace(go.Scatter(x=resumo_receita.index, y=mean_assessor_array, name='ROA Médio Assessor', mode='lines', line=dict(width=2, dash='dot')), secondary_y=True)
     
-    fig.update_traces(selector=dict(name='Receita'), marker_color='rgb(29,40,67)', marker_line_color='rgb(29,40,67)',
-                  marker_line_width=1.5, opacity=.96)
+    fig.update_traces(selector=dict(name='Receita'), marker_color='rgb(29,40,67)', marker_line_color='rgb(29,40,67)',)
+                  #marker_line_width=1.5, opacity=.96)
     
-    fig.update_traces(selector=dict(name='ROA'), marker_color='rgb(125, 147, 189)', marker_line_color='rgb(125, 147, 189)',
-                  marker_line_width=1.5, opacity=.96)
+    fig.update_traces(selector=dict(name='ROA'), marker_color='rgb(125, 147, 189)', marker_line_color='rgb(125, 147, 189)',)
+                  #marker_line_width=1.5, opacity=.96)
     
-    fig.update_traces(selector=dict(name='ROA Fatorial'), marker_color='rgb(149, 149, 149)', marker_line_color='rgb(149, 149, 149)',
-                  marker_line_width=1.5, opacity=.96)
+    fig.update_traces(selector=dict(name='ROA Fatorial'), marker_color='rgb(149, 149, 149)', marker_line_color='rgb(149, 149, 149)')
+                  #marker_line_width=1.5, opacity=.96)
 
     fig.update_traces(selector=dict(name='ROA Médio Assessor'), marker_color='rgb(68, 81, 103)', marker_line_color='rgb(68, 81, 103)',
                   marker_line_width=1.5, opacity=.96)
@@ -172,8 +172,15 @@ def app(name, receitas=receitas, captacao=captacao, carteiras=carteiras, assesso
     #media_produto_mes[['Receita', 'NET']] /= len(month[start_idx : end_idx + 1 : ])
     media_produto_mes['ROA Fatorial'] = media_produto_mes['Receita'] / media_produto_mes['NET'] * 12
     media_produto_mes.sort_values('Receita', inplace=True, ascending=False)
+    media_produto_mes.rename(columns={'Receita':'Receita Fatorial'}, inplace=True)
 
     receitas_filt = receitas_filt.groupby(['Centro de Custo']).sum().reset_index()
+
+    receitas_filt['% Receita'] = receitas_filt['Receita']/sum(receitas_filt['Receita'])
+
+    receitas_filt= receitas_filt.merge(media_produto_mes[['Centro de Custo', 'Receita Fatorial']],how='left',on='Centro de Custo')
+
+    receitas_filt['% Receita Fatorial'] = receitas_filt['Receita Fatorial']/sum(receitas_filt['Receita Fatorial'])
 
     carteiras_filt = carteiras[carteiras['Month'].isin( month[start_idx : end_idx + 1 : ] )]
 
@@ -187,41 +194,41 @@ def app(name, receitas=receitas, captacao=captacao, carteiras=carteiras, assesso
 
     receitas_filt['ROA'] = receitas_filt['Receita'] / receitas_filt['PL Médio Mês'] * 12/n_month
 
-    receitas_filt = receitas_filt.fillna(0).sort_values('Receita', ascending=False)
+    del receitas_filt['PL Médio Mês']
+
     receitas_filt = receitas_filt.merge(media_produto_mes[['Centro de Custo', 'ROA Fatorial']], how='left', on='Centro de Custo')
+    receitas_filt = receitas_filt.fillna(0).sort_values('Receita', ascending=False)
 
     fig = px.pie(receitas_filt, 'Centro de Custo', 'Receita')
 
-    fig.update_traces(marker_colors=[f'rgb({29 + 30*i},{40 + 30*i},{67 + 30*i})' for i in range(len(receitas_filt.index))],
-        marker_line_width=.5, opacity=.96)
+    fig.update_traces(marker_colors=[f'rgb({29 + 30*i},{40 + 30*i},{67 + 30*i})' for i in range(len(receitas_filt.index))])
     
     fig.update_layout(title=f'<b>Disposição da Receita {nomes_filtrados[0]}</b>', barmode='stack',
                          title_x=0.5, title_font_size=20)
-    
-    fig_m = px.pie(media_produto_mes, 'Centro de Custo', 'Receita')
 
-    fig_m.update_traces(marker_colors=[f'rgb({29 + 30*i},{40 + 30*i},{67 + 30*i})' for i in range(len(media_produto_mes.index))],
-        marker_line_width=.5, opacity=.96)
-    
-    fig_m.update_layout(title='<b>Disposição da Receita Fatorial</b>', barmode='stack',
-                         title_x=0.5, title_font_size=20)
+    col1, col2 = st.columns(2)
 
-    col1, col2, col3 = st.columns([2.5 , 2.5 , 3])
-
-    col1.plotly_chart(fig_m, use_container_width=True)
-    col2.plotly_chart(fig, use_container_width=True)
+    col1.plotly_chart(fig, use_container_width=True)
 
     display_df = receitas_filt.copy().set_index('Centro de Custo')
     display_df['ROA'] *= 100
     display_df['ROA Fatorial'] *= 100
+    display_df['% Receita'] *= 100
+    display_df['% Receita Fatorial'] *= 100
 
     del display_df['Ano']
     
-    col3.write(display_df.style.format({'PL Médio Mês':'R$ {:,.2f}', 'ROA Fatorial':'{:,.3f} %', 'Receita':'R$ {:,.2f}', 'ROA':'{:,.3f} %'}))
+    col2.write(display_df.style.format({
+        'Receita Fatorial':'R$ {:,.2f}', 
+        'ROA Fatorial':'{:,.3f} %', 
+        'Receita':'R$ {:,.2f}', 
+        'ROA':'{:,.3f} %',
+        '% Receita':'{:,.2f} %',
+        '% Receita Fatorial':'{:,.2f} %'}))
 
     df = to_excel(receitas_filt)
 
-    col3.download_button(
+    col2.download_button(
         label='Receita por Área',
         data = df,
         file_name = f'Receita por Área {start_month}-{end_month}.xlsx',

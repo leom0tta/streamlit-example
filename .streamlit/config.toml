@@ -1,7 +1,7 @@
 [theme]
 primaryColor="#1d2843"
-backgroundColor="#efe5dc"
-secondaryBackgroundColor="#f1e2d2"
+backgroundColor="#fcecdc"
+secondaryBackgroundColor="#fce5cd"
 textColor="#11153d"
 showWarningOnDirectExecution = false
 

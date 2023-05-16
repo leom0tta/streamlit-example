@@ -1,4 +1,4 @@
-from imports import st, pd
+from imports import pd, st
 
 from functions import to_excel, Get
 from config import adms, private, exclusive, digital, team_jansen
@@ -47,7 +47,7 @@ def app(name):
     filt_aniversario = aniversario[mask_date_input]
 
     display_df = filt_aniversario[['Nome assessor Relacionamento', 'Cliente', 'NomeCliente', 'Nome assessor Indicador', 'Data de Aniversário']]
-
+    
     col2.write(display_df)
 
     df = to_excel(aniversario, index=False)
